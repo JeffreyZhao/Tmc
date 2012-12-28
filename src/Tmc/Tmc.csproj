@@ -39,6 +39,8 @@
     <Compile Include="DebugView.cs" />
     <Compile Include="ErrorMessages.cs" />
     <Compile Include="HashedLinkedList.cs" />
+    <Compile Include="NullableKey.cs" />
+    <Compile Include="NullableKeyEqualityComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
