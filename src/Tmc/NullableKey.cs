@@ -29,5 +29,19 @@
             return _value == null ? NullValueHashCode : _value.GetHashCode();
 // ReSharper restore CompareNonConstrainedGenericWithNull
         }
+
+        public override string ToString() {
+// ReSharper disable CompareNonConstrainedGenericWithNull
+            return _value == null ? "<null>" : _value.ToString();
+// ReSharper restore CompareNonConstrainedGenericWithNull
+        }
+
+        public static implicit operator T(NullableKey<T> key) {
+            return key._value;
+        }
+
+        public static implicit operator NullableKey<T>(T value) {
+            return new NullableKey<T>(value);
+        }
     }
 }
