@@ -1,6 +1,9 @@
 ﻿namespace Tmc
 {
-    public struct NullableKey<T> {
+    using System;
+    using System.Collections.Generic;
+
+    public struct NullableKey<T> : IComparable<NullableKey<T>>  {
 // ReSharper disable StaticFieldInGenericType
         private static readonly bool CouldBeNull = typeof(T).IsClass;
         private static readonly int NullValueHashCode = new object().GetHashCode();
@@ -22,6 +25,10 @@
 
         public bool Equals(NullableKey<T> that) {
             return CouldBeNull ? Equals(_value, that._value) : _value.Equals(that._value);
+        }
+
+        public int CompareTo(NullableKey<T> other) {
+            return Comparer<NullableKey<T>>.Default.Compare(this, other);
         }
 
         public override int GetHashCode() {
