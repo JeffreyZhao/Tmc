@@ -40,6 +40,7 @@
     <Compile Include="ErrorMessages.cs" />
     <Compile Include="HashedLinkedList.cs" />
     <Compile Include="NullableKey.cs" />
+    <Compile Include="NullableKeyComparer.cs" />
     <Compile Include="NullableKeyEqualityComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
