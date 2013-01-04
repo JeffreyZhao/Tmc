@@ -8,7 +8,7 @@
     [DebuggerTypeProxy(typeof (CollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
     public sealed class HashedLinkedList<T> : ICollection<T>, ICollection {
-        private readonly IEqualityComparer<T> _comparer;
+        private readonly Dictionary<NullableKey<T>, HashedLinkedListNode<T>> _mappingNodes;
 
         private object _syncRoot;
         private int _count;
@@ -17,10 +17,11 @@
         // This HashedLinkedList is a doubly-linked circular list.
         internal HashedLinkedListNode<T> _head;
 
-        public HashedLinkedList() { }
+        public HashedLinkedList() : this((IEqualityComparer<T>)null) { }
 
         public HashedLinkedList(IEqualityComparer<T> comparer) {
-            _comparer = comparer ?? EqualityComparer<T>.Default;
+            var keyComparer = new NullableKeyEqualityComparer<T>(comparer ?? EqualityComparer<T>.Default);
+            _mappingNodes = new Dictionary<NullableKey<T>, HashedLinkedListNode<T>>(keyComparer);
         }
 
         public HashedLinkedList(IEnumerable<T> collection) : this(collection, null) { }
@@ -190,34 +191,12 @@
         }
 
         public HashedLinkedListNode<T> Find(T value) {
-            if (_head == null) return null;
-
-            var node = _head;
-
-            do {
-                if (_comparer.Equals(node.Value, value)) {
-                    return node;
-                }
-                node = node._next;
-            } while (node != _head);
-
-            return null;
+            HashedLinkedListNode<T> node;
+            return _mappingNodes.TryGetValue(value, out node) ? node : null;
         }
 
         public HashedLinkedListNode<T> FindLast(T value) {
-            if (_head == null) return null;
-
-            var last = _head._prev;
-            var node = last;
-
-            do {
-                if (_comparer.Equals(node.Value, value)) {
-                    return node;
-                }
-                node = node._prev;
-            } while (node != last);
-
-            return null;
+            return Find(value);
         }
 
         public IEnumerator<T> GetEnumerator() {
@@ -255,6 +234,15 @@
             RemoveNode(_head._prev);
         }
 
+        private void AddMappingNode(HashedLinkedListNode<T> node) {
+            try {
+                _mappingNodes.Add(node.Value, node);
+            }
+            catch (ArgumentException) {
+                throw new ArgumentException(ErrorMessages.HashedLinkedListAddingDuplicate);
+            }
+        }
+        
         private IEnumerator<T> GetEnumerator(int currentVersion) {
             if (currentVersion != _version) {
                 throw new InvalidOperationException(ErrorMessages.EnumFailedVersion);
@@ -274,6 +262,8 @@
         }
 
         private void InsertNodeBefore(HashedLinkedListNode<T> node, HashedLinkedListNode<T> newNode) {
+            AddMappingNode(newNode);
+
             newNode._next = node;
             newNode._prev = node._prev;
             node._prev._next = newNode;
@@ -286,6 +276,8 @@
         private void InsertNodeToEmptyList(HashedLinkedListNode<T> newNode) {
             Debug.Assert(_head == null && _count == 0, "The list must be empty when this method is called!");
 
+            AddMappingNode(newNode);
+
             newNode._next = newNode;
             newNode._prev = newNode;
             _head = newNode;
@@ -297,6 +289,8 @@
         private void RemoveNode(HashedLinkedListNode<T> node) {
             Debug.Assert(node._list == this, "Deleting the node from another list!");
             Debug.Assert(_head != null, "This method shouldn't be called on empty list!");
+
+            _mappingNodes.Remove(node.Value);
 
             if (node._next == node) {
                 Debug.Assert(_count == 1 && _head == node, "this should only be true for a list with only one node");
