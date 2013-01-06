@@ -39,9 +39,9 @@
             _comparer = comparer ?? EqualityComparer<TKey>.Default;
         }
 
-        public HashDictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { }
+        public HashDictionary(ICollection<KeyValuePair<TKey, TValue>> dictionary) : this(dictionary, null) { }
 
-        public HashDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer) :
+        public HashDictionary(ICollection<KeyValuePair<TKey, TValue>> dictionary, IEqualityComparer<TKey> comparer) :
             this(dictionary != null ? dictionary.Count : 0, comparer) {
 
             if (dictionary == null) {
@@ -181,8 +181,8 @@
 // ReSharper restore CompareNonConstrainedGenericWithNull
 
             if (_buckets != null) {
-                int hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
-                for (int i = _buckets[hashCode%_buckets.Length]; i >= 0; i = _entries[i].Next) {
+                var hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
+                for (var i = _buckets[hashCode % _buckets.Length]; i >= 0; i = _entries[i].Next) {
                     if (_entries[i].HashCode == hashCode && _comparer.Equals(_entries[i].Key, key)) return i;
                 }
             }
