@@ -41,6 +41,7 @@
     <Compile Include="ErrorMessages.cs" />
     <Compile Include="HashedLinkedList.cs" />
     <Compile Include="HashHelpers.cs" />
+    <Compile Include="IDictionary.cs" />
     <Compile Include="NullableKey.cs" />
     <Compile Include="NullableKeyComparer.cs" />
     <Compile Include="NullableKeyEqualityComparer.cs" />

@@ -65,7 +65,7 @@
             get { return _keys ?? (_keys = new KeyCollection(this)); }
         }
 
-        ICollection<TKey> IDictionary<TKey, TValue>.Keys {
+        ICollection<TKey> System.Collections.Generic.IDictionary<TKey, TValue>.Keys {
             get { return Keys; }
         }
 
@@ -73,7 +73,7 @@
             get { return _values ?? (_values = new ValueCollection(this)); }
         }
 
-        ICollection<TValue> IDictionary<TKey, TValue>.Values {
+        ICollection<TValue> System.Collections.Generic.IDictionary<TKey, TValue>.Values {
             get { return Values; }
         }
 
@@ -298,9 +298,13 @@
         }
 
         public bool Remove(TKey key) {
+            TValue value;
+            return Remove(key, out value);
+        }
+
+        public bool Remove(TKey key, out TValue value) {
 // ReSharper disable CompareNonConstrainedGenericWithNull
-            if (key == null)
-            {
+            if (key == null) {
                 throw new ArgumentNullException("key");
             }
 // ReSharper restore CompareNonConstrainedGenericWithNull
@@ -309,6 +313,7 @@
                 var hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
                 var bucket = hashCode % _buckets.Length;
                 var last = -1;
+
                 for (var i = _buckets[bucket]; i >= 0; last = i, i = _entries[i].Next) {
                     if (_entries[i].HashCode == hashCode && _comparer.Equals(_entries[i].Key, key)) {
                         if (last < 0) {
@@ -317,6 +322,8 @@
                         else {
                             _entries[last].Next = _entries[i].Next;
                         }
+
+                        value = _entries[i].Value;
 
                         _entries[i].HashCode = -1;
                         _entries[i].Next = _freeList;
@@ -331,6 +338,7 @@
                 }
             }
 
+            value = default(TValue);
             return false;
         }
 
