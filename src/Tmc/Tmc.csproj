@@ -37,8 +37,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DebugView.cs" />
+    <Compile Include="HashDictionary.cs" />
     <Compile Include="ErrorMessages.cs" />
     <Compile Include="HashedLinkedList.cs" />
+    <Compile Include="HashHelpers.cs" />
     <Compile Include="NullableKey.cs" />
     <Compile Include="NullableKeyComparer.cs" />
     <Compile Include="NullableKeyEqualityComparer.cs" />
