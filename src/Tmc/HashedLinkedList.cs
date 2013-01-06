@@ -239,15 +239,11 @@
                 _mappingNodes.Add(node.Value, node);
             }
             catch (ArgumentException) {
-                throw new ArgumentException(ErrorMessages.HashedLinkedListAddingDuplicate);
+                throw new ArgumentException(ErrorMessages.AddingDuplicate);
             }
         }
-        
-        private IEnumerator<T> GetEnumerator(int currentVersion) {
-            if (currentVersion != _version) {
-                throw new InvalidOperationException(ErrorMessages.EnumFailedVersion);
-            }
 
+        private IEnumerator<T> GetEnumerator(int currentVersion) {
             var node = _head;
             if (node != null) {
                 do {
@@ -258,6 +254,10 @@
                     yield return node.Value;
                     node = node._next;
                 } while (node != _head);
+            }
+
+            if (currentVersion != _version) {
+                throw new InvalidOperationException(ErrorMessages.EnumFailedVersion);
             }
         }
 
